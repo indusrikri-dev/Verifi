@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifi</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Verifi</p>
+        <h1>Understand your money in plain English.</h1>
+      </div>
+      <button class="voice-button" id="voiceButton" type="button" aria-pressed="false">
+        <span aria-hidden="true">♪</span>
+        Voice help
+      </button>
+    </header>
+
+    <main id="main" class="app-shell">
+      <section class="hero-panel" aria-labelledby="hero-title">
+        <div>
+          <h2 id="hero-title">Upload a bank statement. Get a simple, careful review.</h2>
+          <p>
+            Verifi turns confusing financial documents into clear next steps, flags possible scams,
+            and lets a trusted family member help when needed.
+          </p>
+        </div>
+        <div class="hero-actions" aria-label="Main actions">
+          <label class="upload-control" for="statementUpload">
+            <span aria-hidden="true">+</span>
+            Upload statement
+          </label>
+          <input id="statementUpload" type="file" accept=".pdf,.csv,.txt,.png,.jpg,.jpeg" />
+          <button class="secondary-action" id="sampleReviewButton" type="button">
+            Try sample review
+          </button>
+        </div>
+      </section>
+
+      <section class="status-strip" aria-label="Review status">
+        <article>
+          <span class="status-dot safe"></span>
+          <div>
+            <strong id="reviewStatus">Ready to review</strong>
+            <p id="reviewSource">Upload a statement or use the sample.</p>
+          </div>
+        </article>
+        <article>
+          <span class="status-dot warning"></span>
+          <div>
+            <strong id="alertCount">0 alerts</strong>
+            <p>Unusual charges and scam patterns.</p>
+          </div>
+        </article>
+        <article>
+          <span class="status-dot share"></span>
+          <div>
+            <strong id="familyStatus">Family sharing off</strong>
+            <p>Invite one trusted helper.</p>
+          </div>
+        </article>
+      </section>
+
+      <div class="content-grid">
+        <section class="review-area" aria-labelledby="summary-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Statement summary</p>
+              <h2 id="summary-title">What happened this month</h2>
+            </div>
+            <button class="icon-button" id="readSummaryButton" type="button" aria-label="Read summary aloud">
+              <span aria-hidden="true">▶</span>
+            </button>
+          </div>
+
+          <div class="summary-cards">
+            <article>
+              <p>Money in</p>
+              <strong id="moneyIn">$0</strong>
+              <span id="incomeNote">No statement reviewed yet.</span>
+            </article>
+            <article>
+              <p>Money out</p>
+              <strong id="moneyOut">$0</strong>
+              <span id="spendingNote">No spending details yet.</span>
+            </article>
+            <article>
+              <p>Left over</p>
+              <strong id="leftOver">$0</strong>
+              <span id="leftOverNote">We will explain this after review.</span>
+            </article>
+          </div>
+
+          <div class="plain-language">
+            <h3>Plain-English explanation</h3>
+            <p id="plainExplanation">
+              Your summary will appear here. It will avoid banking jargon and explain what needs
+              your attention first.
+            </p>
+          </div>
+
+          <div class="alerts-panel" aria-labelledby="alerts-title">
+            <h3 id="alerts-title">Things to check</h3>
+            <ul id="alertsList">
+              <li>No suspicious activity found yet because no statement has been reviewed.</li>
+            </ul>
+          </div>
+        </section>
+
+        <aside class="side-panel" aria-label="Helpful tools">
+          <section class="tool-block">
+            <h2>Trusted family helper</h2>
+            <p>Share a simple view with someone you trust. They can review alerts, not move money.</p>
+            <form id="familyForm">
+              <label for="familyName">Helper name</label>
+              <input id="familyName" name="familyName" type="text" placeholder="Example: Maya" />
+              <label for="familyEmail">Helper email</label>
+              <input id="familyEmail" name="familyEmail" type="email" placeholder="maya@example.com" />
+              <button type="submit">Send invite</button>
+            </form>
+            <p class="form-message" id="familyMessage" role="status"></p>
+          </section>
+
+          <section class="tool-block">
+            <h2>Subscription terms checker</h2>
+            <p>Paste or upload terms. Verifi looks for hidden fees, renewal traps, and cancellation rules.</p>
+            <textarea id="termsInput" rows="6" placeholder="Paste subscription terms here"></textarea>
+            <button id="checkTermsButton" type="button">Check terms</button>
+            <div class="terms-result" id="termsResult" role="status">
+              No terms checked yet.
+            </div>
+          </section>
+
+          <section class="tool-block emergency">
+            <h2>Need help now?</h2>
+            <p>If something looks wrong, do not call numbers from a suspicious email or text.</p>
+            <button id="safetyChecklistButton" type="button">Show safety steps</button>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <dialog id="safetyDialog">
+      <div class="dialog-header">
+        <h2>Safety steps</h2>
+        <button class="icon-button" id="closeSafetyDialog" type="button" aria-label="Close safety steps">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <ol>
+        <li>Do not send money, gift cards, or codes to anyone asking urgently.</li>
+        <li>Call your bank using the phone number on your card or official website.</li>
+        <li>Ask your trusted family helper to review the alert with you.</li>
+        <li>Change passwords if you shared login information.</li>
+      </ol>
+    </dialog>
+
+    <script src="script.js"></script>
+  </body>
+</html>

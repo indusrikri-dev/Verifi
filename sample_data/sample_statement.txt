@@ -1,0 +1,29 @@
+Sunrise Community Bank — Checking Account Statement
+Account holder: Sample Customer
+Statement period: July 1, 2026 - July 31, 2026
+Starting balance: $1,960.14
+Ending balance: $2,442.28
+
+Date        Description                                Amount
+07/01/2026  Social Security Deposit                     +$1,842.00
+07/01/2026  Rent Payment - Maple Court Apartments        -$925.00
+07/03/2026  Grocery Mart #14                             -$86.42
+07/05/2026  Pharmacy Plus - Prescription copay            -$24.99
+07/05/2026  Pharmacy Plus - Prescription copay            -$24.99
+07/06/2026  Electric & Water Utility Co.                  -$118.30
+07/08/2026  WebMarketPro Online Order                     -$89.99
+07/09/2026  Grocery Mart #14                              -$54.10
+07/10/2026  StreamFlix Monthly Subscription (new)         -$14.99
+07/12/2026  Gas Station - Fuel Stop                       -$38.20
+07/14/2026  Pension Payment                               +$540.00
+07/15/2026  Phone Bill - MobileConnect                    -$62.00
+07/18/2026  ATM Withdrawal - Main St Branch                -$100.00
+07/20/2026  Grocery Mart #14                              -$71.85
+07/22/2026  Medical Copay - Riverside Clinic               -$40.00
+07/24/2026  Restaurant - Corner Diner                      -$28.75
+07/26/2026  Wire Transfer Out - Unknown Recipient "J.K."  -$300.00
+07/28/2026  Grocery Mart #14                              -$63.28
+07/30/2026  Interest Earned                               +$0.28
+
+Total money in: $2,382.28
+Total money out: $2,042.86 (approx; see line items)
