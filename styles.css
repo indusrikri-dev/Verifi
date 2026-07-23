@@ -21,6 +21,34 @@ color-scheme: light;
   box-sizing: border-box;
 }
 
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 8px;
+  border: 3px solid var(--line);
+  border-top-color: var(--brand-strong);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner[hidden] {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.6s;
+  }
+}
+
 body {
   margin: 0;
   background: var(--paper);
