@@ -15,6 +15,8 @@ const familyMessage = document.querySelector("#familyMessage");
 const termsInput = document.querySelector("#termsInput");
 const termsResult = document.querySelector("#termsResult");
 const checkTermsButton = document.querySelector("#checkTermsButton");
+const reviewSpinner = document.querySelector("#reviewSpinner");
+const termsSpinner = document.querySelector("#termsSpinner");
 const voiceButton = document.querySelector("#voiceButton");
 const readSummaryButton = document.querySelector("#readSummaryButton");
 const safetyChecklistButton = document.querySelector("#safetyChecklistButton");
@@ -51,6 +53,7 @@ async function readErrorMessage(response) {
 }
 
 function renderReview(review) {
+  reviewSpinner.hidden = true;
   currentReview = review;
   currentExplanation = review.explanation;
   reviewStatus.textContent = "Review complete";
@@ -85,11 +88,13 @@ function renderReview(review) {
 }
 
 function setReviewLoading(message) {
+  reviewSpinner.hidden = false;
   reviewStatus.textContent = message;
   reviewSource.textContent = "Please wait...";
 }
 
 function setReviewError(message) {
+  reviewSpinner.hidden = true;
   reviewStatus.textContent = "Review failed";
   reviewSource.textContent = message;
   setText("#plainExplanation", message);
@@ -196,6 +201,7 @@ checkTermsButton.addEventListener("click", async () => {
   }
 
   checkTermsButton.disabled = true;
+  termsSpinner.hidden = false;
   termsResult.textContent = "Checking terms...";
 
   try {
@@ -219,6 +225,7 @@ checkTermsButton.addEventListener("click", async () => {
     termsResult.textContent = error.message;
   } finally {
     checkTermsButton.disabled = false;
+    termsSpinner.hidden = true;
   }
 });
 
