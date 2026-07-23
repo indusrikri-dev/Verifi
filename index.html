@@ -45,7 +45,10 @@
         <article>
           <span class="status-dot safe"></span>
           <div>
-            <strong id="reviewStatus">Ready to review</strong>
+            <strong>
+              <span class="spinner" id="reviewSpinner" hidden aria-hidden="true"></span>
+              <span id="reviewStatus">Ready to review</span>
+            </strong>
             <p id="reviewSource">Upload a statement or use the sample.</p>
           </div>
         </article>
@@ -130,6 +133,7 @@
             <p>Paste or upload terms. Verifi looks for hidden fees, renewal traps, and cancellation rules.</p>
             <textarea id="termsInput" rows="6" placeholder="Paste subscription terms here"></textarea>
             <button id="checkTermsButton" type="button">Check terms</button>
+            <span class="spinner" id="termsSpinner" hidden aria-hidden="true"></span>
             <div class="terms-result" id="termsResult" role="status">
               No terms checked yet.
             </div>
