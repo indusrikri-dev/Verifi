@@ -5,6 +5,8 @@ import secrets
 import time
 from pathlib import Path
 
+import psycopg2
+import psycopg2.extras
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory, abort
 import anthropic
@@ -20,12 +22,64 @@ MAX_TEXT_CHARS = 30000
 ALLOWED_EXTENSIONS = {".pdf", ".csv", ".txt", ".png", ".jpg", ".jpeg"}
 SHARE_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
 app = Flask(__name__, static_folder=None)
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
 
 _client = None
-# In-memory store for family-share links. Fine for a prototype; resets on restart.
+# In-memory fallback for family-share links when no DATABASE_URL is configured.
+# Used for local dev only; resets on restart.
 _shares = {}
+
+
+def get_db_connection():
+    if not DATABASE_URL:
+        return None
+    return psycopg2.connect(DATABASE_URL)
+
+
+def init_db():
+    conn = get_db_connection()
+    if conn is None:
+        return
+    with conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS reviews (
+                id SERIAL PRIMARY KEY,
+                source TEXT NOT NULL,
+                review_data JSONB NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+            """
+        )
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS shares (
+                token TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                review_data JSONB NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+            """
+        )
+    conn.close()
+
+
+def save_review(result):
+    conn = get_db_connection()
+    if conn is None:
+        return
+    with conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO reviews (source, review_data) VALUES (%s, %s)",
+            (result.get("source", ""), psycopg2.extras.Json(result)),
+        )
+    conn.close()
+
+
+init_db()
 
 
 def get_client():
@@ -216,6 +270,7 @@ def review_sample():
     if error_response:
         return error_response
     result["source"] = "Sample July bank statement"
+    save_review(result)
     return jsonify(result)
 
 
@@ -240,7 +295,28 @@ def review_upload():
     if error_response:
         return error_response
     result["source"] = file.filename
+    save_review(result)
     return jsonify(result)
+
+
+@app.route("/api/reviews", methods=["GET"])
+def list_reviews():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify(error="No database configured."), 500
+
+    with conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, source, review_data, created_at FROM reviews ORDER BY created_at DESC LIMIT 100"
+        )
+        rows = cur.fetchall()
+    conn.close()
+
+    reviews = [
+        {"id": r[0], "source": r[1], "review": r[2], "created_at": r[3].isoformat()}
+        for r in rows
+    ]
+    return jsonify(reviews=reviews)
 
 
 @app.route("/api/terms-check", methods=["POST"])
@@ -269,11 +345,19 @@ def create_share():
     if not name:
         return jsonify(error="Please add the helper's name."), 400
 
-    now = time.time()
-    _shares_gc(now)
-
     token = secrets.token_urlsafe(16)
-    _shares[token] = {"review": review, "name": name, "created_at": now}
+    conn = get_db_connection()
+    if conn is not None:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO shares (token, name, review_data) VALUES (%s, %s, %s)",
+                (token, name, psycopg2.extras.Json(review)),
+            )
+        conn.close()
+    else:
+        now = time.time()
+        _shares_gc(now)
+        _shares[token] = {"review": review, "name": name, "created_at": now}
 
     url = request.host_url.rstrip("/") + f"/share/{token}"
     return jsonify(token=token, url=url)
@@ -283,6 +367,23 @@ def _shares_gc(now):
     expired = [t for t, s in _shares.items() if now - s["created_at"] > SHARE_TTL_SECONDS]
     for t in expired:
         del _shares[t]
+
+
+def get_share(token):
+    conn = get_db_connection()
+    if conn is not None:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT name, review_data FROM shares WHERE token = %s", (token,)
+            )
+            row = cur.fetchone()
+        conn.close()
+        if row is None:
+            return None
+        return {"name": row[0], "review": row[1]}
+
+    _shares_gc(time.time())
+    return _shares.get(token)
 
 
 def _escape(text):
@@ -296,8 +397,7 @@ def _escape(text):
 
 @app.route("/share/<token>")
 def view_share(token):
-    _shares_gc(time.time())
-    share = _shares.get(token)
+    share = get_share(token)
     if not share:
         return (
             "<!doctype html><html><head><link rel='stylesheet' href='/styles.css'>"
